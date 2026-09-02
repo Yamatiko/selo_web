@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prose from '../components/Prose.astro';
+import NewsList from '../components/NewsList.astro';
+import { getHome, getNews } from '../lib/content';
+
+const home = await getHome();
+const news = home.showNews ? await getNews(home.newsLimit) : [];
+---
+
+<BaseLayout description={`${home.name} — ${home.role}`}>
+  <div class="intro">
+    {
+      home.photo && (
+        <img class="portrait" src={home.photo} alt={home.photoAlt} width="150" height="150" loading="eager" />
+      )
+    }
+    <div>
+      <h1>{home.name}</h1>
+      {home.role && <p class="role">{home.role}</p>}
+      {home.affiliation && <p class="affiliation">{home.affiliation}</p>}
+      {home.location && <p class="affiliation">{home.location}</p>}
+    </div>
+  </div>
+
+  {home.intro && <Prose html={home.intro} class="lead" />}
+
+  <NewsList items={news} />
+</BaseLayout>
+
+<style>
+  .intro {
+    display: flex;
+    gap: var(--space-6);
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+  }
+
+  .portrait {
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    margin-bottom: var(--space-2);
+  }
+
+  .role {
+    font-size: var(--text-md);
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .affiliation {
+    color: var(--color-text-soft);
+    margin-bottom: var(--space-1);
+  }
+
+  .intro + :global(.lead) {
+    font-size: var(--text-md);
+  }
+
+  @media (max-width: 34rem) {
+    .intro {
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+  }
+</style>

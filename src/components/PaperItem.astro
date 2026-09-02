@@ -1,0 +1,134 @@
+---
+import Prose from './Prose.astro';
+import type { Paper } from '../lib/content';
+
+interface Props {
+  paper: Paper;
+}
+
+const { paper } = Astro.props;
+
+const authorNames = paper.authors.map((a) => a.name);
+
+const venueParts: string[] = [];
+if (paper.journal) {
+  let v = paper.journal;
+  if (paper.volume) v += ` ${paper.volume}`;
+  if (paper.issue) v += `(${paper.issue})`;
+  if (paper.pages) v += `, ${paper.pages}`;
+  venueParts.push(v);
+}
+if (paper.status) venueParts.push(paper.status);
+if (paper.updatedLabel) venueParts.push(`Updated ${paper.updatedLabel}`);
+
+const doiUrl = paper.doi ? `https://doi.org/${paper.doi}` : undefined;
+
+const abstractLabel = paper.kind === 'work-in-progress' ? 'Summary' : 'Abstract';
+---
+
+<article class="paper">
+  <h3 class="title">{paper.title}</h3>
+
+  <p class="byline">
+    {authorNames.length > 0 && <span>{authorNames.join(', ')}</span>}
+    {paper.year && <span class="year">{paper.year}</span>}
+  </p>
+
+  {venueParts.length > 0 && <p class="venue">{venueParts.join(' · ')}</p>}
+
+  <div class="links">
+    {paper.pdfUrl && (
+      <a href={paper.pdfUrl} target="_blank" rel="noopener">PDF</a>
+    )}
+    {doiUrl && (
+      <a href={doiUrl} target="_blank" rel="noopener">DOI</a>
+    )}
+    {paper.links.map((link) => (
+      <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+    ))}
+  </div>
+
+  {
+    paper.hasBody && (
+      <details class="abstract">
+        <summary>{abstractLabel}</summary>
+        <Prose html={paper.body} />
+      </details>
+    )
+  }
+</article>
+
+<style>
+  .paper {
+    padding-block: var(--space-5);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .paper:last-child {
+    border-bottom: none;
+  }
+
+  .title {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-2);
+  }
+
+  .byline {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+
+  .byline .year::before {
+    content: '·';
+    margin: 0 0.5ch;
+    color: var(--color-text-faint);
+  }
+
+  .venue {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--color-text-faint);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .links a {
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+
+  .links a:hover {
+    color: var(--accent);
+  }
+
+  .abstract {
+    margin-top: var(--space-3);
+  }
+
+  .abstract summary {
+    cursor: pointer;
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+    width: fit-content;
+  }
+
+  .abstract summary:hover {
+    color: var(--accent);
+  }
+
+  .abstract > :global(.prose) {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+</style>

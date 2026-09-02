@@ -1,0 +1,41 @@
+---
+import PaperItem from './PaperItem.astro';
+import type { PaperSection } from '../lib/content';
+
+interface Props {
+  section: PaperSection;
+}
+
+const { section } = Astro.props;
+---
+
+<section id={section.id} class="paper-section">
+  <h2>{section.label}</h2>
+  {
+    section.papers.length > 0 ? (
+      <div class="list">
+        {section.papers.map((paper) => (
+          <PaperItem paper={paper} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-soft empty">Nothing here yet.</p>
+    )
+  }
+</section>
+
+<style>
+  .paper-section {
+    margin-bottom: var(--space-8);
+    scroll-margin-top: 5rem;
+  }
+
+  .paper-section h2 {
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--color-border-strong);
+  }
+
+  .empty {
+    font-size: var(--text-sm);
+  }
+</style>

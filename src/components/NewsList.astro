@@ -1,0 +1,70 @@
+---
+import Prose from './Prose.astro';
+import type { NewsEntry } from '../lib/content';
+
+interface Props {
+  items: NewsEntry[];
+  heading?: string;
+}
+
+const { items, heading = 'News' } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="news">
+      <h2>{heading}</h2>
+      <ul>
+        {items.map((item) => (
+          <li>
+            {item.dateLabel && <span class="date">{item.dateLabel}</span>}
+            <div class="body">
+              <Prose html={item.body} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .news {
+    margin-top: var(--space-8);
+  }
+
+  .news ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .news li {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  .news li:last-child {
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .date {
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+    padding-top: 0.1rem;
+  }
+
+  .body :global(.prose) {
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 34rem) {
+    .news li {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Prose from '../../components/Prose.astro';
+import PaperList from '../../components/PaperList.astro';
+import { getResearchIntro, getResearchSections } from '../../lib/content';
+
+const [intro, sections] = await Promise.all([getResearchIntro(), getResearchSections()]);
+---
+
+<BaseLayout title="Research" activePath="/research">
+  <div class="page-header">
+    <p class="eyebrow">Research</p>
+    <h1>{intro.heading}</h1>
+    {intro.hasIntro && <Prose html={intro.intro} />}
+  </div>
+
+  <nav class="section-nav" aria-label="Research sections">
+    {sections.map((section) => <a href={`#${section.id}`}>{section.label}</a>)}
+  </nav>
+
+  {sections.map((section) => <PaperList section={section} />)}
+</BaseLayout>
+
+<style>
+  .section-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .section-nav a {
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+
+  .section-nav a:hover {
+    color: var(--accent);
+  }
+</style>

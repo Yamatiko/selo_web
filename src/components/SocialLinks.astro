@@ -1,0 +1,50 @@
+---
+import type { SocialLink } from '../lib/content';
+
+interface Props {
+  links: SocialLink[];
+  email?: string;
+  class?: string;
+}
+
+const { links, email, class: className } = Astro.props;
+---
+
+{
+  (links.length > 0 || email) && (
+    <ul class:list={['socials', className]}>
+      {email && (
+        <li>
+          <a href={`mailto:${email}`}>Email</a>
+        </li>
+      )}
+      {links.map((link) => (
+        <li>
+          <a href={link.url} rel="me noopener" target="_blank">
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .socials a {
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+
+  .socials a:hover {
+    color: var(--accent);
+  }
+</style>

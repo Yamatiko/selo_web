@@ -1,0 +1,281 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import type { NavItem } from '../lib/content';
+
+interface Props {
+  items: NavItem[];
+  siteTitle: string;
+  activePath: string;
+}
+
+const { items, siteTitle, activePath } = Astro.props;
+
+const RESEARCH_SUBNAV = [
+  { label: 'Work in Progress', href: '/research#work-in-progress' },
+  { label: 'Working Papers', href: '/research#working-papers' },
+  { label: 'Publications', href: '/research#publications' },
+];
+
+const isActive = (href: string) => {
+  const path = href.split('#')[0];
+  if (path === '/') return activePath === '/';
+  return activePath === path || activePath.startsWith(`${path}/`);
+};
+---
+
+<header class="site-header" data-nav>
+  <div class="container container--wide bar">
+    <a href="/" class="brand">{siteTitle}</a>
+
+    <button
+      class="menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+      aria-label="Toggle menu"
+      data-nav-toggle
+    >
+      <span class="menu-icon"></span>
+    </button>
+
+    <nav id="primary-nav" class="links" aria-label="Primary">
+      {
+        items.map((item) =>
+          item.href === '/research' ? (
+            <div class="has-sub">
+              <a href={item.href} class:list={['link', { active: isActive(item.href) }]}>
+                {item.label}
+              </a>
+              <ul class="sub">
+                {RESEARCH_SUBNAV.map((s) => (
+                  <li>
+                    <a href={s.href}>{s.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a href={item.href} class:list={['link', { active: isActive(item.href) }]}>
+              {item.label}
+            </a>
+          ),
+        )
+      }
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const header = document.querySelector('[data-nav]');
+    const btn = header?.querySelector('[data-nav-toggle]');
+    if (!header || !btn) return;
+    btn.addEventListener('click', () => {
+      const open = header.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    header.querySelectorAll('#primary-nav a').forEach((a) => {
+      a.addEventListener('click', () => {
+        header.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(8px);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.75rem;
+  }
+
+  .brand {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  .brand:hover {
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  .link {
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+    padding-block: var(--space-2);
+    white-space: nowrap;
+  }
+
+  .link:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .link.active {
+    color: var(--accent);
+  }
+
+  .has-sub {
+    position: relative;
+  }
+
+  .sub {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: var(--space-2);
+    list-style: none;
+    min-width: 12rem;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.12s ease;
+  }
+
+  .has-sub:hover .sub,
+  .has-sub:focus-within .sub {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .sub li a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+    border-radius: 4px;
+  }
+
+  .sub li a:hover {
+    background: var(--color-mark);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: none;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--color-text);
+  }
+
+  .menu-icon,
+  .menu-icon::before,
+  .menu-icon::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: currentColor;
+    transition: transform 0.15s ease;
+  }
+
+  .menu-icon {
+    position: relative;
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .menu-icon::before {
+    top: -6px;
+  }
+  .menu-icon::after {
+    top: 6px;
+  }
+
+  .is-open .menu-icon {
+    background: transparent;
+  }
+  .is-open .menu-icon::before {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .is-open .menu-icon::after {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  @media (max-width: 44rem) {
+    .menu-btn {
+      display: flex;
+    }
+
+    .links {
+      display: none;
+      position: absolute;
+      right: var(--space-5);
+      left: var(--space-5);
+      top: calc(100% + var(--space-2));
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-1);
+      padding: var(--space-3);
+      background: var(--color-surface);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .is-open .links {
+      display: flex;
+    }
+
+    .link {
+      padding: var(--space-3);
+      border-radius: var(--radius);
+    }
+
+    .link:hover {
+      background: var(--color-mark);
+    }
+
+    .has-sub {
+      position: static;
+    }
+
+    .sub {
+      position: static;
+      transform: none;
+      opacity: 1;
+      visibility: visible;
+      box-shadow: none;
+      border: none;
+      padding: 0 0 var(--space-2) var(--space-3);
+      min-width: 0;
+    }
+  }
+</style>

@@ -1,0 +1,18 @@
+siteTitle: Your Name
+tagline: >-
+  PhD candidate in Economics at Example University — labour economics and applied
+  microeconometrics.
+navItems:
+  - label: Home
+    href: /
+  - label: CV
+    href: /cv
+  - label: Research
+    href: /research
+  - label: Hobbies
+    href: /hobbies
+  - label: Contact
+    href: /contact
+accentLight: '#2f5d50'
+accentDark: '#8fb8ac'
+footerText: © 2026 Your Name

@@ -1,0 +1,84 @@
+---
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/inter';
+import '../styles/global.css';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { getContact, getSiteSettings } from '../lib/content';
+import { SITE_URL } from '../config/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Pathname of the current page, for nav highlighting, e.g. "/research". */
+  activePath?: string;
+  wide?: boolean;
+}
+
+const { title, description, activePath = Astro.url.pathname, wide = false } = Astro.props;
+
+const [settings, contact] = await Promise.all([getSiteSettings(), getContact()]);
+
+const pageTitle = title ? `${title} · ${settings.siteTitle}` : settings.siteTitle;
+const metaDescription = description ?? settings.tagline;
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+
+// settings.accentLight / accentDark are validated against a colour allowlist in
+// the content layer, so they are safe to interpolate here.
+const accentCss = `:root{--accent:${settings.accentLight};}` +
+  `:root[data-theme='dark']{--accent:${settings.accentDark};}` +
+  `@media (prefers-color-scheme:dark){:root:not([data-theme='light']){--accent:${settings.accentDark};}}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <title>{pageTitle}</title>
+    {metaDescription && <meta name="description" content={metaDescription} />}
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <style is:inline set:html={accentCss}></style>
+
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.dataset.theme = stored;
+          }
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Nav items={settings.navItems} siteTitle={settings.siteTitle} activePath={activePath} />
+
+    <main id="main" class="page-main">
+      <div class:list={['container', { 'container--wide': wide }]}>
+        <slot />
+      </div>
+    </main>
+
+    <Footer
+      siteTitle={settings.siteTitle}
+      footerText={settings.footerText}
+      socials={contact.socials}
+      email={contact.email}
+    />
+  </body>
+</html>

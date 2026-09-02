@@ -1,0 +1,84 @@
+---
+// Toggles between light and dark, persisting the choice. The no-flash init
+// script lives in BaseLayout; this only handles the click.
+---
+
+<button class="theme-toggle" type="button" aria-label="Toggle colour theme" data-theme-toggle>
+  <svg class="sun" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+    <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <line x1="12" y1="2" x2="12" y2="4.5" />
+      <line x1="12" y1="19.5" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="4.5" y2="12" />
+      <line x1="19.5" y1="12" x2="22" y2="12" />
+      <line x1="4.6" y1="4.6" x2="6.4" y2="6.4" />
+      <line x1="17.6" y1="17.6" x2="19.4" y2="19.4" />
+      <line x1="4.6" y1="19.4" x2="6.4" y2="17.6" />
+      <line x1="17.6" y1="6.4" x2="19.4" y2="4.6" />
+    </g>
+  </svg>
+  <svg class="moon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"
+      fill="currentColor"
+    />
+  </svg>
+</button>
+
+<script is:inline>
+  (() => {
+    const btn = document.querySelector('[data-theme-toggle]');
+    if (!btn) return;
+    const prefersDark = () =>
+      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.dataset.theme || (prefersDark() ? 'dark' : 'light');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch (_) {}
+    });
+  })();
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    background: none;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+  }
+
+  .moon {
+    display: none;
+  }
+
+  :root[data-theme='dark'] .theme-toggle .sun {
+    display: none;
+  }
+  :root[data-theme='dark'] .theme-toggle .moon {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-toggle .sun {
+      display: none;
+    }
+    :root:not([data-theme='light']) .theme-toggle .moon {
+      display: block;
+    }
+  }
+</style>

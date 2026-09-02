@@ -1,0 +1,176 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prose from '../components/Prose.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { getContact } from '../lib/content';
+
+const contact = await getContact();
+---
+
+<BaseLayout title="Contact" description="Get in touch">
+  <div class="page-header">
+    <p class="eyebrow">Get in touch</p>
+    <h1>Contact</h1>
+    {contact.hasIntro && <Prose html={contact.intro} />}
+  </div>
+
+  <dl class="details">
+    {
+      contact.email && (
+        <div>
+          <dt>Email</dt>
+          <dd>
+            <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          </dd>
+        </div>
+      )
+    }
+    {
+      contact.office && (
+        <div>
+          <dt>Office</dt>
+          <dd class="office">{contact.office}</dd>
+        </div>
+      )
+    }
+    {
+      contact.socials.length > 0 && (
+        <div>
+          <dt>Elsewhere</dt>
+          <dd>
+            <SocialLinks links={contact.socials} />
+          </dd>
+        </div>
+      )
+    }
+  </dl>
+
+  {
+    contact.enableForm && (
+      <section class="form-wrap">
+        <h2>Send a message</h2>
+        {contact.formIntro && <p class="text-soft">{contact.formIntro}</p>}
+
+        <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form">
+          <input type="hidden" name="form-name" value="contact" />
+          <p class="hp">
+            <label>
+              Leave this field empty
+              <input name="bot-field" />
+            </label>
+          </p>
+
+          <label>
+            Name
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Message
+            <textarea name="message" rows="6" required></textarea>
+          </label>
+
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .details {
+    margin: 0 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .details div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-4);
+  }
+
+  .details dt {
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+
+  .details dd {
+    margin: 0;
+  }
+
+  .office {
+    white-space: pre-line;
+    color: var(--color-text-soft);
+  }
+
+  .form-wrap h2 {
+    font-size: var(--text-lg);
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 32rem;
+    margin-top: var(--space-5);
+  }
+
+  .form label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+
+  .form input,
+  .form textarea {
+    font: inherit;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+  }
+
+  .form input:focus,
+  .form textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .form button {
+    align-self: flex-start;
+    font: inherit;
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-6);
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .form button:hover {
+    opacity: 0.9;
+  }
+
+  .hp {
+    position: absolute;
+    left: -9999px;
+  }
+
+  @media (max-width: 34rem) {
+    .details div {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>

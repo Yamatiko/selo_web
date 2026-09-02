@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prose from '../components/Prose.astro';
+import { getHobbies, getHobbiesIntro } from '../lib/content';
+
+const [intro, hobbies] = await Promise.all([getHobbiesIntro(), getHobbies()]);
+---
+
+<BaseLayout title="Hobbies" description="Beyond research">
+  <div class="page-header">
+    <p class="eyebrow">Away from the desk</p>
+    <h1>{intro.heading}</h1>
+    {intro.hasIntro && <Prose html={intro.intro} />}
+  </div>
+
+  {
+    hobbies.length > 0 ? (
+      <div class="hobbies">
+        {hobbies.map((hobby) => (
+          <article class="hobby">
+            {hobby.cover && <img src={hobby.cover} alt="" loading="lazy" />}
+            <h2>{hobby.title}</h2>
+            <Prose html={hobby.body} />
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p class="text-soft">Hobbies will appear here once added in the admin.</p>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .hobbies {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+
+  .hobby h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .hobby img {
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    width: 100%;
+    object-fit: cover;
+  }
+</style>

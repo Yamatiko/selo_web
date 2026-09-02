@@ -1,0 +1,44 @@
+---
+import SocialLinks from './SocialLinks.astro';
+import type { SocialLink } from '../lib/content';
+
+interface Props {
+  siteTitle: string;
+  footerText: string;
+  socials: SocialLink[];
+  email?: string;
+}
+
+const { siteTitle, footerText, socials, email } = Astro.props;
+const year = new Date().getFullYear();
+const notice = footerText || `© ${year} ${siteTitle}`;
+---
+
+<footer class="site-footer">
+  <div class="container container--wide inner">
+    <p class="notice">{notice}</p>
+    <SocialLinks links={socials} email={email} />
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: var(--border-width) solid var(--color-border);
+    padding-block: var(--space-6);
+    margin-top: var(--space-8);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .notice {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+  }
+</style>

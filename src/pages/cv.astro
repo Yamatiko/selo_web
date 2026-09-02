@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prose from '../components/Prose.astro';
+import CVSection from '../components/CVSection.astro';
+import { getCV } from '../lib/content';
+
+const cv = await getCV();
+---
+
+<BaseLayout title="CV" description="Curriculum vitae">
+  <div class="page-header cv-head">
+    <div>
+      <p class="eyebrow">Curriculum Vitae</p>
+      <h1>CV</h1>
+    </div>
+    {
+      cv.pdfUrl && (
+        <a class="download" href={cv.pdfUrl} target="_blank" rel="noopener">
+          Download PDF
+        </a>
+      )
+    }
+  </div>
+
+  {cv.hasIntro && <Prose html={cv.intro} />}
+
+  {
+    cv.sections.length > 0 ? (
+      cv.sections.map((section) => <CVSection section={section} />)
+    ) : (
+      <p class="text-soft">CV entries will appear here once added in the admin.</p>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .cv-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .download {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius);
+    color: var(--color-text);
+  }
+
+  .download:hover {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+</style>
