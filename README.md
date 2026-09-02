@@ -89,23 +89,39 @@ one never affects another.
 1. Push this repo to GitHub.
 2. In Netlify: **Add new site → Import from Git**. Build settings come from
    `netlify.toml` (build `npm run build`, publish `dist`).
-3. Set environment variables (**Site configuration → Environment variables**):
+3. Set on Netlify (**Site configuration → Environment variables**):
 
    | Variable | Value |
    | --- | --- |
-   | `SITE_URL` | `https://your-domain.tld` (used for canonical URLs + sitemap) |
-   | `PUBLIC_KEYSTATIC_GITHUB_REPO` | `your-github-user/your-repo` |
+   | `SITE_URL` | `https://your-site.netlify.app` (or your domain) — canonical URLs + sitemap |
+   | `PUBLIC_KEYSTATIC_GITHUB_REPO` | `Yamatiko/selo_web` |
 
-4. First deploy will succeed but the admin is still in local mode. Turn on
-   GitHub mode:
-   - Visit `https://your-site/keystatic` and follow the setup flow — it creates a
-     GitHub App and shows you the values for:
+4. **Create the GitHub App locally** (the setup wizard writes secrets to `.env`,
+   which a deployed host can't do — running it on Netlify just downloads broken
+   files):
+
+   ```bash
+   echo "PUBLIC_KEYSTATIC_GITHUB_REPO=Yamatiko/selo_web" > .env
+   npm run dev
+   ```
+
+   - Open <http://localhost:4321/keystatic> → it's now in GitHub mode and shows
+     **Keystatic Setup**.
+   - **Deployed App URL**: `https://your-site.netlify.app` · **organization**: blank.
+   - **Create GitHub App** → create it on GitHub → you're redirected back and the
+     four values are written into your local `.env`:
      `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`,
      `KEYSTATIC_SECRET`, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`.
-   - Add all four to Netlify env vars (alongside `PUBLIC_KEYSTATIC_GITHUB_REPO`)
-     and redeploy.
-5. From then on, edits made at `/keystatic` are committed to GitHub and Netlify
-   rebuilds automatically.
+   - On GitHub, **install** the new App on the `selo_web` repo
+     (github.com/settings/apps → your app → Install App).
+
+5. Copy those four values from `.env` into Netlify env vars, then **Deploys →
+   Trigger deploy**.
+
+6. `https://your-site.netlify.app/keystatic` → **Log in with GitHub** → authorize.
+   From now on, edits there commit to `main` and Netlify rebuilds automatically.
+   (`.env` stays local and git-ignored; local `npm run dev` now also uses GitHub
+   mode. Delete `.env` to go back to local file-editing mode.)
 
 ### Contact form
 

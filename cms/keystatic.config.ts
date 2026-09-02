@@ -19,16 +19,18 @@ import { hobbies } from './collections/hobbies';
  * This file is bundled for the browser (the /keystatic admin), so it must use
  * `import.meta.env` — never `process.env`.
  *
- * Storage:
- *  - dev             → local mode (writes files straight to the working tree)
- *  - prod + repo env  → GitHub mode (the /keystatic admin commits via a GitHub App)
- *  - prod, no env     → falls back to local mode (reads still work at build time)
+ * Storage is decided purely by whether PUBLIC_KEYSTATIC_GITHUB_REPO is set:
+ *  - not set  → local mode (admin writes files straight to the working tree)
+ *  - set      → GitHub mode (admin commits via a GitHub App)
+ *
+ * It is deliberately NOT gated on `import.meta.env.PROD` so the one-time
+ * "Create GitHub App" setup wizard can be run locally (`.env` with the repo var),
+ * which is the only place it can write the generated secrets to `.env`.
  */
 const repo = import.meta.env.PUBLIC_KEYSTATIC_GITHUB_REPO as `${string}/${string}` | undefined;
-const useGitHub = import.meta.env.PROD && !!repo;
 
 export default config({
-  storage: useGitHub ? { kind: 'github', repo: repo! } : { kind: 'local' },
+  storage: repo ? { kind: 'github', repo } : { kind: 'local' },
   ui: {
     brand: { name: 'Site admin' },
     navigation: {
