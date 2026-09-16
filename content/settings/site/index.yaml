@@ -1,7 +1,5 @@
 siteTitle: Selen Eski
-tagline: >-
-  PhD candidate in Economics at Example University — labour economics and
-  applied microeconometrics.
+tagline: Third-year PhD in Finance student
 navItems:
   - label: Home
     href: /
@@ -9,8 +7,8 @@ navItems:
     href: /cv
   - label: Research
     href: /research
-  - label: Hobbies
-    href: /hobbies
+  - label: Unpublished Findings
+    href: /unpublished-findings
   - label: Contact
     href: /contact
 accentLight: '#2f5d50'
